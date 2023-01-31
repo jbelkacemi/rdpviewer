@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <link rel="icon" type="image/x-icon" href="image/icono.ico">
+    <link href="css/main.css" rel="stylesheet">
+    <title>RDP VIEWER 1.2</title>
+
+       <script type="text/javascript" src="/eel.js"></script>
+  </head>
+
+  <body class="p-3 m-0 border-0 bd-example">
+<nav class="navbar bg-body-tertiary">
+  <div class="container-fluid">
+    <a class="navbar-brand">RDP VIEWER 1.2</a>
+
+
+      <a onclick="run()" class="btn btn-outline-success" >
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-repeat" viewBox="0 0 16 16">
+  <path d="M11.534 7h3.932a.25.25 0 0 1 .192.41l-1.966 2.36a.25.25 0 0 1-.384 0l-1.966-2.36a.25.25 0 0 1 .192-.41zm-11 2h3.932a.25.25 0 0 0 .192-.41L2.692 6.23a.25.25 0 0 0-.384 0L.342 8.59A.25.25 0 0 0 .534 9z"/>
+  <path fill-rule="evenodd" d="M8 3c-1.552 0-2.94.707-3.857 1.818a.5.5 0 1 1-.771-.636A6.002 6.002 0 0 1 13.917 7H12.9A5.002 5.002 0 0 0 8 3zM3.1 9a5.002 5.002 0 0 0 8.757 2.182.5.5 0 1 1 .771.636A6.002 6.002 0 0 1 2.083 9H3.1z"/>
+</svg>
+      </a>
+
+  </div>
+</nav>
+
+<div  id='Pacientes' class="row">
+
+
+</div>
+
+<div class="modal fade" id="Modal1" tabindex="-1" role="dialog" aria-labelledby="ModalLabel1" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Sesión Desconectada</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+          No se puede conectar a una sessión <span class="text-danger">desconectada</span>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+      </div>
+    </div>
+  </div>
+</div>
+    <footer class="footer">
+      <div class="container">
+        <span class="text-muted">powered by CETAIT SL</span>
+      </div>
+    </footer>
+
+  <script src="js/jquery-3.2.1.slim.min.js"></script>
+  <script src="js/popper.min.js" ></script>
+  <script src="js/bootstrap.min.js" ></script>
+
+<script>
+
+</script>
+  <script type="text/javascript">
+
+  function objectLength( object ) {
+    return Object.entries(object).length;
+}
+
+    async function run() {
+        let container = document.querySelector('#Pacientes');
+        container.innerHTML = "";
+        let n = await eel.bingR()();
+        if(objectLength(n) > 0){
+              n.forEach(function (arrayitem){
+                if (arrayitem['state'] == "Activo"){
+                  container.innerHTML += `
+              <div  data-id="1" class="card connection" style="width: 18rem;">
+               <a onclick="connect(${arrayitem['id']},'${arrayitem['computer']}')" ><img src="image/Windows.jpg" class="card-img-top" alt="...">
+              <div class="card-body">
+                  <span class="card-text">
+                    <div ><strong>Nombre:</strong> ${arrayitem['fullname']}</div>
+                    <div><strong>Conexion:</strong> ${arrayitem['logon']} </div>
+                    <div><strong>Inactividad:</strong> ${arrayitem['inactivity']} min</div>
+
+                    <div><strong>Estado:</strong> <span class="text-success">${arrayitem['state']}</span> </div>
+                  </p>
+              </div>
+              </a>
+            </div>`;
+                }else {
+                       container.innerHTML += `
+              <div  data-id="1" class="card connection" style="width: 18rem;border-color: red;border-width: 2px;">
+               <a data-toggle="modal" data-target="#Modal1" ><img src="image/Windows.jpg" class="card-img-top" alt="...">
+              <div class="card-body">
+                  <p class="card-text">
+                    <div ><strong>Nombre:</strong> ${arrayitem['fullname']}</div>
+                    <div><strong>Conexion:</strong> ${arrayitem['logon']} </div>
+                    <div><strong>Inactividad:</strong> ${arrayitem['inactivity']} min </div>
+
+                    <div><strong>Estado:</strong> <span class="text-danger">${arrayitem['state']} </span></div>
+                  </p>
+              </div>
+              </a>
+            </div>`;
+                }
+
+
+        })
+        }
+
+    }
+function cron(){
+	run();
+    // setTimeout(cron, 30000);
+}
+
+cron()
+ function connect(id,computer) {
+        console.log(id);
+        console.log(computer)
+    eel.connection(id, computer)
+    }
+var key = [123,112,113,114,115,17,65,82,83,87,84,85,79,80,70,71,72,71,74,75,78]
+document.onkeypress = function (event) {
+event = (event || window.event);
+if (key.includes(event.keyCode) ) {
+return false;
+}
+}
+document.onmousedown = function (event) {
+event = (event || window.event);
+if (key.includes(event.keyCode)) {
+return false;
+}
+}
+document.onkeydown = function (event) {
+event = (event || window.event);
+if (key.includes(event.keyCode)) {
+return false;
+}
+}
+document.addEventListener("contextmenu", function(e){
+    e.preventDefault();
+}, false);
+    </script>
+   </body>
+</html>
